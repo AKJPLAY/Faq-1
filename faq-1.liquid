@@ -1,0 +1,163 @@
+{% style %}
+#shopify-section-{{ section.id }} .inner-container {
+    padding-block: 40px;
+    width: 700px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-inline: 10px;
+  }
+  #shopify-section-{{ section.id }} .inner-container .title {
+    font-family: "Onest";
+    font-style: normal;
+    font-weight: 700;
+    font-size: 39px;
+    line-height: 1.3;
+    color: #000000;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  #shopify-section-{{ section.id }} .inner-container .faqs-container faq-s {
+    background: #F4F4F5;
+    border-radius: 13px;
+    display: block;
+    padding: 10px 15px;
+    margin-block: 15px;
+  }
+  #shopify-section-{{ section.id }} .inner-container .faqs-container faq-s .question svg path:nth-child(2) {
+    transform: rotateZ(0deg);
+    transform-origin: center;
+    transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+  #shopify-section-{{ section.id }} .inner-container .faqs-container faq-s[open] .question svg path:nth-child(2) {
+    transform: rotateZ(90deg);
+    transform-origin: center;
+  }
+  #shopify-section-{{ section.id }} .inner-container .faqs-container .question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  #shopify-section-{{ section.id }} .inner-container .faqs-container .question .text {
+    font-family: "Onest";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.38;
+    color: #27272A;
+  }
+  #shopify-section-{{ section.id }} .inner-container .faqs-container .question .icon-container {
+    width: 35px;
+    height: 35px;
+    background: #000000;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #shopify-section-{{ section.id }} .inner-container .faqs-container .answer {
+    overflow: hidden;
+    transition: height 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+  #shopify-section-{{ section.id }} .inner-container .faqs-container .answer .answer-inner-area {
+    font-family: "Onest";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.57;
+    color: #3F3F46;
+  }
+{% endstyle %}
+<div class="inner-container">
+    <h2 class="title">
+        {{ section.settings.title }}
+    </h2>
+    <div class="faqs-container">
+        {% for block in section.blocks %}
+            <faq-s>
+                <h3 class="question">
+                    <span class="text">
+                        {{ block.settings.question }}
+                    </span>
+                    <div class="icon-container">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 7H13" stroke="#E4E4E7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 13V1" stroke="#E4E4E7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </h3>
+                <div class="answer" style="height: 0;">
+                    <div class="answer-inner-area">
+                        {{ block.settings.answer }}
+                    </div>
+                </div>
+            </faq-s>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    if(!customElements.get('faq-s')){
+        class FAQ extends HTMLElement {
+            constructor() {
+                super();
+                const question = this.querySelector('.question');
+                question.addEventListener('click', this.toggleFaq.bind(this))
+            }
+
+            toggleFaq = () => {
+                this.toggleAttribute('open');
+                const answer = this.querySelector('.answer');
+                this.hasAttribute('open') ? answer.style.height = answer.scrollHeight + 'px' : answer.style.height = 0;
+                this.parentElement.querySelectorAll('faq-s').forEach(faq => {
+                    if(faq != this) {
+                        const answer = faq.querySelector('.answer');
+                        faq.removeAttribute('open');
+                        answer.style.height = 0;
+                    }
+                });
+            }
+        }
+        customElements.define('faq-s', FAQ);
+    }
+</script> 
+
+{% schema %}
+{
+    "name": "FAQ's",
+    "class": "faq-new",
+    "tag": "section",
+    "presets": [
+        {
+            "name":"FAQ's"
+        }
+    ],
+    "blocks": [
+        {
+            "name": "Faq",
+            "type": "inline_richtext",
+            "settings": [
+                {
+                    "type": "inline_richtext",
+                    "id": "question",
+                    "label": "Question",
+                    "default": "What is mouth tape?"
+                },
+                {
+                    "type": "richtext",
+                    "id": "answer",
+                    "label": "Answer",
+                    "default": "<p>Our mouth tape is made from 100% triple-woven cotton with a hypoallergenic adhesive for maximum comfort. The strips are latex-free.</p>"
+                }
+            ]
+        }
+    ],
+    "settings": [
+        {
+            "type": "inline_richtext",
+            "id": "title",
+            "label": "Title",
+            "default": "Frequently Asked Questions"
+        }
+    ]
+}
+{% endschema %}
